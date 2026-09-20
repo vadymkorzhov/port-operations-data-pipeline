@@ -1,0 +1,45 @@
+services:
+
+
+  vessel_api:
+    build:
+      context: ./sources/api
+    container_name: port_vessel_api
+
+    ports:
+      - "8000:8000"
+
+  source_postgres:
+    image: postgres:16
+    container_name: port_source_postgres
+
+    environment:
+      POSTGRES_DB: berth_operations
+      POSTGRES_USER: source_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    ports:
+      - "5434:5432"
+
+    volumes:
+      - source_postgres_data:/var/lib/postgresql/data
+      - ./sources/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+  postgres:
+    image: postgres:16
+    container_name: port_operations_postgres
+
+    environment:
+      POSTGRES_DB: port_operations
+      POSTGRES_USER: ops_user
+      POSTGRES_PASSWORD: ${PORT_OPS_PASSWORD}
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./port_ops/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  source_postgres_data:
+  postgres_data:

@@ -1,0 +1,4 @@
+{
+  "url": "http://localhost:8000/api/v1/vessel-calls?utm_source=chatgpt.com",
+  "s3_bucket": "port-operations-pipeline-vk"
+}
