@@ -1,0 +1,8 @@
+pandas
+requests
+boto3[crt]
+sqlalchemy
+psycopg2-binary
+pyarrow
+python-dotenv
+dbt-postgres

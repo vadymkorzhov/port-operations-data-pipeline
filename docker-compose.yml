@@ -1,3 +1,42 @@
+x-airflow-common:
+  &airflow-common
+  build:
+    context: .
+    dockerfile: Dockerfile
+
+  environment:
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:${AIRFLOW_POSTGRES_PASSWORD}@airflow_postgres:5432/airflow_postgres
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow_api_server:8080/execution/
+    AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW_JWT_SECRET}
+    AIRFLOW__API__SECRET_KEY: ${AIRFLOW_API_SECRET}
+    POSTGRES_HOST: source_postgres
+    POSTGRES_PORT: 5432
+    POSTGRES_DB: berth_operations
+    POSTGRES_USER: source_user
+    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+
+    PORT_OPS_HOST: port_operations_postgres
+    PORT_OPS_PORT: 5432
+    PORT_OPS_DB: port_operations
+    PORT_OPS_USER: ops_user
+    PORT_OPS_PASSWORD: ${PORT_OPS_PASSWORD}
+
+    VESSEL_API_URL: http://vessel_api:8000/api/v1/vessel-calls
+
+  volumes:
+    - ./dag:/opt/airflow/dags
+    - ./ingestion:/opt/airflow/ingestion
+    - ./port_operations_dbt:/opt/airflow/dbt
+    - ./config:/opt/airflow/config
+    - ${USERPROFILE}/.aws:/home/airflow/.aws:ro
+    - ${USERPROFILE}/.dbt:/home/airflow/.dbt:ro
+
+  depends_on:
+    - airflow_postgres
+
+
 services:
 
 
@@ -24,7 +63,8 @@ services:
     volumes:
       - source_postgres_data:/var/lib/postgresql/data
       - ./sources/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
-  postgres:
+
+  port_operations_postgres:
     image: postgres:16
     container_name: port_operations_postgres
 
@@ -40,6 +80,50 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./port_ops/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
 
+  airflow_postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: ${AIRFLOW_POSTGRES_PASSWORD}
+      POSTGRES_DB: airflow_postgres
+
+    volumes:
+      - airflow_postgres:/var/lib/postgresql/data
+
+
+  airflow-init:
+    <<: *airflow-common
+    command: db migrate
+    depends_on:
+      - airflow_postgres
+
+  airflow-dag-processor:
+    <<: *airflow-common
+    command: dag-processor
+
+
+  airflow_scheduler:
+    <<: *airflow-common
+    command: scheduler
+
+    depends_on:
+      - airflow_postgres
+      - vessel_api
+      - source_postgres
+      - port_operations_postgres
+
+  airflow_api_server:
+    <<: *airflow-common
+    command: api-server
+
+    ports:
+      - "8080:8080"
+
+
+
+
 volumes:
   source_postgres_data:
   postgres_data:
+  airflow_postgres:
+

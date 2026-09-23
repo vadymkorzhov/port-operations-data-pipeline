@@ -1,7 +1,31 @@
+# Environment / secrets
 .env
+.env.*
+!.env.example
+
+# Python
 .venv/
-.idea/
+venv/
 __pycache__/
-*.pyc
+*.py[cod]
+
+# IDE
+.idea/
+.vscode/
+
+# Airflow
+logs/
+airflow.cfg
+
+# dbt generated
+**/target/
+**/logs/
+**/dbt_packages/
+
+# Local pipeline data
 data/incoming/
 data/processed/
+
+# OS
+.DS_Store
+Thumbs.db

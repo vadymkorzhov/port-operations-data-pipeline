@@ -1,4 +1,6 @@
 import json
+import shutil
+
 import requests
 import pandas as pd
 from pathlib import Path
@@ -26,18 +28,20 @@ def extract_api_data(url,s3,s3_bucket):
     save_to_s3(data,s3,s3_bucket,s3_key)
     return s3_key
 
-def extract_csv_data(incoming_folder, processed_folder,s3,s3_bucket):
-    s3_keys= []
-    processed_folder.mkdir(parents=True, exist_ok=True)
+def extract_csv_data(incoming_folder,s3,s3_bucket):
+    extracted_files= []
+
     for csv_path in incoming_folder.glob("*.csv"):
         with open(csv_path, "rb") as f:
             csv_data = f.read()
         s3_key =build_s3_key("cargo_operations","csv")
-        s3_keys.append(s3_key)
+        extracted_files.append({
+            "s3_key": s3_key,
+            "csv_path": csv_path,
+        })
         save_to_s3(csv_data,s3,s3_bucket,s3_key)
-        destination = processed_folder / csv_path.name
-        csv_path.rename(destination)
-    return s3_keys
+
+    return extracted_files
 
 
 def extract_postgres_data(s3,s3_bucket):

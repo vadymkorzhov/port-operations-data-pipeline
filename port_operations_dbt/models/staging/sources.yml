@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: port_ops
+    schema: raw
+
+    tables:
+      - name: vessel_raw
+      - name: cargo_ops_raw
+      - name: berth_ops_raw

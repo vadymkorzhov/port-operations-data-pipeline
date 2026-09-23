@@ -1,0 +1,75 @@
+version: 2
+
+models:
+  - name: stg_vessel
+    description: vessel_data
+
+    columns:
+      - name: vessel_call_id
+        tests:
+          - not_null
+          - unique
+
+
+      - name: berth
+        tests:
+          - not_null
+
+      - name: updated_at
+        tests:
+          - not_null
+
+
+  - name: stg_cargo_ops
+    description: cargo_ops_data
+
+    columns:
+      - name: move_id
+        tests:
+          - not_null
+          - unique
+
+      - name: vessel_call_id
+        tests:
+          - not_null
+          - relationships:
+                arguments:
+                  to: ref('stg_vessel')
+                  field: vessel_call_id
+
+      - name: move_type
+        tests:
+          - not_null
+
+      - name: weight_kg
+        tests:
+          - not_null
+
+  - name: stg_berth_ops
+    description: berth_ops_data
+
+    columns:
+      - name: operation_id
+        tests:
+          - not_null
+          - unique
+
+      - name: vessel_call_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_vessel')
+                field: vessel_call_id
+
+      - name: berth_id
+        tests:
+          - not_null
+
+      - name: status
+        tests:
+          - not_null
+
+      - name: updated_at
+        tests:
+          - not_null

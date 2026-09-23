@@ -1,0 +1,22 @@
+version: 2
+models:
+  - name: mart_vessel_performance
+    columns:
+      - name: vessel_call_id
+        tests:
+          - not_null
+          - unique
+
+  - name: mart_berth_performance
+    columns:
+      - name: berth_id
+        tests:
+          - not_null
+          - unique
+
+  - name: mart_terminal_performance
+    columns:
+      - name: terminal
+        tests:
+          - not_null
+          - unique
