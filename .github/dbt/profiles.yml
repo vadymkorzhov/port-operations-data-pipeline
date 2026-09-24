@@ -1,0 +1,13 @@
+port_operations_dbt:
+  target: ci
+
+  outputs:
+    ci:
+      type: postgres
+      host: localhost
+      port: 5432
+      user: ci_user
+      password: ci_password
+      dbname: port_operations
+      schema: staging
+      threads: 1
