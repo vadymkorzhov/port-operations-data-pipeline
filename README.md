@@ -1,17 +1,5 @@
 ## Project Overview
 
-REST API ─────┐
-CSV files ────┼──→ Python Ingestion ──→ AWS S3
-PostgreSQL ───┘                           │
-                                         ↓
-                                  PostgreSQL RAW
-                                         │
-                                         ↓
-                                        dbt
-                                  ┌──────┴──────┐
-                               Staging        Marts
-
-
 An end-to-end data engineering pipeline that extracts port operations data from multiple heterogeneous sources using Python. 
 Raw source data is archived in AWS S3 and loaded into PostgreSQL, where dbt models transform and validate the data into analytics-ready staging models and performance marts.
 
